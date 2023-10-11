@@ -18,7 +18,7 @@ Deno.test("basic ristretto", () => {
 
   assert(hash.equals(hashBis));
   assertEquals(hash.digest(), hashBis.digest());
-  assertEquals!(hash.digest().byteLength, 32);
+  assertEquals(hash.digest().byteLength, 32);
 });
 
 Deno.test("union ristretto", () => {
