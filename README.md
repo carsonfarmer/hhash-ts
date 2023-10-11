@@ -21,7 +21,7 @@ Bellare, Goldreich, and Goldwasser [introduced the concept](https://cseweb.ucsd.
 
 The ECMH ([elliptic curve multiset hash](https://arxiv.org/pdf/1601.06502.pdf)) is a recent alternative to multiplication modulo a prime (as in MuHash) which uses an elliptic curve group G where the discrete logarithm (DL) problem is hard. Concretely, each element is hashed to a point on such an elliptic curve (e.g. Ristretto group in Curve25519, secp256k1), and the hash is the sum of all such points. The curve's group operations are used to add and remove multisets. Associativity and commutativity then follow. Extremely [fast and constant time algorithms exist](https://arxiv.org/pdf/1601.06502.pdf), but only for char-2 curves. Here we leverage a implementation over the Ristretto group in Curve25519 (based on [this implementation](https://github.com/MystenLabs/fastcrypto/blob/main/fastcrypto/src/hash.rs#L263)), and another using [RFC 9380](https://datatracker.ietf.org/doc/rfc9380/) to hash to a point on the secp256r1 curve. Other formulations exist and appear fast, for example, Tomas van der Wansem [provides an implementation](https://reviews.bitcoinabc.org/D1072#change-bEnKePuHRgCO) that uses [trial-and-hash](https://eprint.iacr.org/2009/226.pdf) to convert the hash into point on the secp256k1 curve.
 
-[In general terms](https://eprint.iacr.org/2019/227.pdf), a set homomorphic hash function H : P({0, 1}∗) → G is defined as transforming a set of input bit-strings in {0, 1}∗ to elements of a commutative group (G, ◦) with two properties: set homomorphism and collision resistance. We say that the function H is set homomorphic for a commutative group (G, ◦) if for any two disjoint sets S, T ∈ P({0, 1}∗), we have that H(S ∪ T) = H(S) ◦ H(T). In addition to the commutative property of the group, the combining operation ◦ must also be associative, such that H(H(S,T),U) = H(S,H(T,U)). Further, we say that H is collision resistant if a computationally bounded adversary A cannot produce two input sets S,T ∈ P({0,1}∗) such that S ≠ T and H(S) = H(T) with non- negligible probability. Note that this is simply the standard definition of collision resistance applied to the function H.
+[In general terms](https://eprint.iacr.org/2019/227.pdf), a set homomorphic hash function H : P({0, 1}∗) → G is defined as transforming a set of input bit-strings in {0, 1}∗ to elements of a commutative group (G, ◦) with two properties: set homomorphism and collision resistance. We say that the function H is set homomorphic for a commutative group (G, ◦) if for any two disjoint sets S, T ∈ P({0, 1}∗), we have that H(S ∪ T) = H(S) ◦ H(T). In addition to the commutative property of the group, the combining operation ◦ must also be associative, such that H(H(S,T),U) = H(S,H(T,U)). Further, we say that H is collision resistant if a computationally bounded adversary A cannot produce two input sets S,T ∈ P({0,1}∗) such that S ≠ T and H(S) = H(T) with non-negligible probability. Note that this is simply the standard definition of collision resistance applied to the function H.
 
 # Usage
 
@@ -46,7 +46,7 @@ Deno.test("main", () => {
 
   assert(hash.equals(hashBis));
   assertEquals(hash.digest(), hashBis.digest());
-  assertEquals!(hash.digest().byteLength, 32);
+  assertEquals(hash.digest().byteLength, 32);
 });
 ```
 
