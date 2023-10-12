@@ -5,7 +5,7 @@ import { RistrettoPoint } from "npm:@noble/curves/ed25519";
 // Needed due to how the RistrettoPoint type is exported
 export type RistrettoPoint = InstanceType<typeof RistrettoPoint>;
 
-export class RistrettoMultisetHash<Data extends Uint8Array> {
+export class RistrettoMultisetHash<Data extends Uint8Array = Uint8Array> {
   constructor(public accumulator: RistrettoPoint = RistrettoPoint.ZERO) {}
 
   static default<Data extends Uint8Array>() {
