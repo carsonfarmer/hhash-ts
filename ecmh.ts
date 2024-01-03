@@ -22,33 +22,41 @@ export class RistrettoMultisetHash implements HomomorphicHasher {
   }
 
   insert(...items: Input[]) {
+    const out = this.clone();
     for (const item of items) {
       const point = RistrettoPoint.hashToCurve(sha512(item));
-      this.accumulator = this.accumulator.add(point);
+      out.accumulator = out.accumulator.add(point);
     }
-    return this;
+    return out;
   }
 
   remove(...items: Input[]) {
+    const out = this.clone();
     for (const item of items) {
       const point = RistrettoPoint.hashToCurve(sha512(item));
-      this.accumulator = this.accumulator.subtract(point);
+      out.accumulator = out.accumulator.subtract(point);
     }
-    return this;
+    return out;
   }
 
   union(other: RistrettoMultisetHash) {
-    this.accumulator = this.accumulator.add(other.accumulator);
-    return this;
+    const out = this.clone();
+    out.accumulator = this.accumulator.add(other.accumulator);
+    return out;
   }
 
   difference(other: RistrettoMultisetHash) {
-    this.accumulator = this.accumulator.subtract(other.accumulator);
-    return this;
+    const out = this.clone();
+    out.accumulator = this.accumulator.subtract(other.accumulator);
+    return out;
   }
 
   digest() {
     const bytes = this.accumulator.toRawBytes();
     return sha256(bytes);
+  }
+
+  clone() {
+    return new RistrettoMultisetHash(this.accumulator) as this;
   }
 }

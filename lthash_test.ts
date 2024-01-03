@@ -6,15 +6,15 @@ import {
 import { LtHash16 } from "./lthash.ts";
 
 Deno.test("basic lthash", () => {
-  const hash = LtHash16.default();
   const elements = ["apple", "banana", "kiwi"];
-  hash.insert(utf8ToBytes(elements[0]));
-  hash.insert(utf8ToBytes(elements[1]));
-  hash.insert(utf8ToBytes(elements[2]));
-  hash.remove(utf8ToBytes(elements[1]));
-  const hashBis = LtHash16.default();
-  hashBis.insert(utf8ToBytes(elements[0]));
-  hashBis.insert(utf8ToBytes(elements[2]));
+  const hash = LtHash16.default()
+    .insert(utf8ToBytes(elements[0]))
+    .insert(utf8ToBytes(elements[1]))
+    .insert(utf8ToBytes(elements[2]))
+    .remove(utf8ToBytes(elements[1]));
+  const hashBis = LtHash16.default()
+    .insert(utf8ToBytes(elements[0]))
+    .insert(utf8ToBytes(elements[2]));
 
   assert(hash.equals(hashBis));
   assertEquals(hash.digest(), hashBis.digest());
@@ -22,11 +22,12 @@ Deno.test("basic lthash", () => {
 });
 
 Deno.test("union lthash", () => {
-  const left = LtHash16.default();
-  left.insert(utf8ToBytes("hello"));
+  const left = LtHash16.default().insert(utf8ToBytes("hello"));
 
-  const right = LtHash16.default();
-  right.insert(utf8ToBytes("world"), utf8ToBytes("lucas"));
+  const right = LtHash16.default().insert(
+    utf8ToBytes("world"),
+    utf8ToBytes("lucas"),
+  );
 
   assert(
     left.union(right).equals(
@@ -49,11 +50,16 @@ Deno.test("union lthash", () => {
 });
 
 Deno.test("difference lthash", () => {
-  const left = LtHash16.default();
-  left.insert(utf8ToBytes("hello"), utf8ToBytes("world"), utf8ToBytes("lucas"));
+  const left = LtHash16.default().insert(
+    utf8ToBytes("hello"),
+    utf8ToBytes("world"),
+    utf8ToBytes("lucas"),
+  );
 
-  const right = LtHash16.default();
-  right.insert(utf8ToBytes("world"), utf8ToBytes("lucas"));
+  const right = LtHash16.default().insert(
+    utf8ToBytes("world"),
+    utf8ToBytes("lucas"),
+  );
 
   assert(
     left.difference(right).equals(
@@ -75,9 +81,9 @@ Deno.test("difference lthash", () => {
 });
 
 Deno.test("interoperability lthash", () => {
-  const hash = LtHash16.default();
-  hash.insert(utf8ToBytes("hello"));
-  hash.insert(utf8ToBytes("world"));
+  const hash = LtHash16.default()
+    .insert(utf8ToBytes("hello"))
+    .insert(utf8ToBytes("world"));
   const observed = hash.digest();
   // This matches with a rust implementation
   const expected = hexToBytes(

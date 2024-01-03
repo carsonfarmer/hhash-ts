@@ -26,12 +26,10 @@ function equalBytes(b1: Uint8Array, b2: Uint8Array) {
 export type HashFunction = (msg: Input, opts?: { dkLen: number }) => Uint8Array;
 
 export class LtHash16 implements HomomorphicHasher {
-  hash: HashFunction;
-  accumulator: Uint16Array = new Uint16Array(SUM_SIZE);
-
-  constructor(hasher: HashFunction = DEFAULT_HASH) {
-    this.hash = hasher;
-  }
+  constructor(
+    public accumulator: Uint16Array = new Uint16Array(SUM_SIZE),
+    public hash: HashFunction = DEFAULT_HASH,
+  ) {}
 
   static default() {
     return new LtHash16();
@@ -60,19 +58,21 @@ export class LtHash16 implements HomomorphicHasher {
   }
 
   insert(...items: Input[]) {
+    const out = this.clone();
     for (const item of items) {
       const hash = this.hash(item, { dkLen: HASH_SIZE });
-      this.#addOne(hash);
+      out.#addOne(hash);
     }
-    return this;
+    return out;
   }
 
   remove(...items: Input[]) {
+    const out = this.clone();
     for (const item of items) {
       const hash = this.hash(item, { dkLen: HASH_SIZE });
-      this.#removeOne(hash);
+      out.#removeOne(hash);
     }
-    return this;
+    return out;
   }
 
   digest() {
@@ -84,18 +84,24 @@ export class LtHash16 implements HomomorphicHasher {
   }
 
   union(other: LtHash16) {
+    const out = this.clone();
     for (let i = 0; i < SUM_SIZE; i++) {
-      this.accumulator[i] = (this.accumulator[i] + other.accumulator[i]) &
+      out.accumulator[i] = (out.accumulator[i] + other.accumulator[i]) &
         0xFFFF;
     }
-    return this;
+    return out;
   }
 
   difference(other: LtHash16) {
+    const out = this.clone();
     for (let i = 0; i < SUM_SIZE; i++) {
-      this.accumulator[i] = (this.accumulator[i] - other.accumulator[i]) &
+      out.accumulator[i] = (out.accumulator[i] - other.accumulator[i]) &
         0xFFFF;
     }
-    return this;
+    return out;
+  }
+
+  clone() {
+    return new LtHash16(this.accumulator, this.hash) as this;
   }
 }
