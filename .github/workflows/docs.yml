@@ -3,6 +3,8 @@ name: docs-ci
 on:
   push:
     branches: [main]
+permissions:
+  contents: write
 
 jobs:
   docs:
@@ -19,8 +21,6 @@ jobs:
           deno doc --html --name=hhash mod.ts
           touch docs/.nojekyll
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: docs
+          folder: docs
