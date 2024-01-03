@@ -16,7 +16,7 @@ jobs:
           deno-version: 1.38
       - name: Generate
         run: |
-          deno docs --html --name=hhash mod.ts
+          deno doc --html --name=hhash mod.ts
           touch docs/.nojekyll
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@3.7.1
