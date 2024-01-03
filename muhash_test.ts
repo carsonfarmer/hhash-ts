@@ -7,29 +7,30 @@ import { chacha20 } from "npm:@noble/ciphers/chacha";
 import { MuHash } from "./muhash.ts";
 
 Deno.test("basic muhash", () => {
-  const hash = MuHash.default();
   const elements = ["apple", "banana", "kiwi"];
-  hash.insert(utf8ToBytes(elements[0]));
-  hash.insert(utf8ToBytes(elements[1]));
-  hash.insert(utf8ToBytes(elements[2]));
-  hash.remove(utf8ToBytes(elements[1]));
-  const hashBis = MuHash.default();
-  hashBis.insert(utf8ToBytes(elements[0]));
-  hashBis.insert(utf8ToBytes(elements[2]));
+  const hash = MuHash.default()
+    .insert(utf8ToBytes(elements[0]))
+    .insert(utf8ToBytes(elements[1]))
+    .insert(utf8ToBytes(elements[2]))
+    .remove(utf8ToBytes(elements[1]));
+  const hashBis = MuHash.default()
+    .insert(utf8ToBytes(elements[0]))
+    .insert(utf8ToBytes(elements[2]));
 
   assert(!hash.equals(hashBis));
   // We have to normalize the hash before comparing it
-  assert(hash.normalize().equals(hashBis));
+  assert(hash.normalized().equals(hashBis));
   assertEquals(hash.digest(), hashBis.digest());
   assertEquals(hash.digest().byteLength, 32);
 });
 
 Deno.test("union muhash", () => {
-  const left = MuHash.default();
-  left.insert(utf8ToBytes("hello"));
+  const left = MuHash.default().insert(utf8ToBytes("hello"));
 
-  const right = MuHash.default();
-  right.insert(utf8ToBytes("world"), utf8ToBytes("lucas"));
+  const right = MuHash.default().insert(
+    utf8ToBytes("world"),
+    utf8ToBytes("lucas"),
+  );
 
   assert(
     left.union(right).equals(
@@ -52,14 +53,19 @@ Deno.test("union muhash", () => {
 });
 
 Deno.test("difference muhash", () => {
-  const left = MuHash.default();
-  left.insert(utf8ToBytes("hello"), utf8ToBytes("world"), utf8ToBytes("lucas"));
+  const left = MuHash.default().insert(
+    utf8ToBytes("hello"),
+    utf8ToBytes("world"),
+    utf8ToBytes("lucas"),
+  );
 
-  const right = MuHash.default();
-  right.insert(utf8ToBytes("world"), utf8ToBytes("lucas"));
+  const right = MuHash.default().insert(
+    utf8ToBytes("world"),
+    utf8ToBytes("lucas"),
+  );
 
   assert(
-    left.difference(right).normalize().equals(
+    left.difference(right).normalized().equals(
       MuHash.default().insert(
         utf8ToBytes("hello"),
       ),
@@ -67,7 +73,7 @@ Deno.test("difference muhash", () => {
   );
 
   assert(
-    !left.difference(right).normalize().equals(
+    !left.difference(right).normalized().equals(
       MuHash.default().insert(
         utf8ToBytes("hello"),
         utf8ToBytes("world"),
@@ -78,10 +84,10 @@ Deno.test("difference muhash", () => {
 });
 
 Deno.test("interoperability muhash", () => {
-  const hash = MuHash.default();
-  hash.insert(new Uint8Array(32));
-  hash.insert(new Uint8Array([1].concat(new Array(31).fill(0))));
-  hash.remove(new Uint8Array([2].concat(new Array(31).fill(0))));
+  const hash = MuHash.default()
+    .insert(new Uint8Array(32))
+    .insert(new Uint8Array([1].concat(new Array(31).fill(0))))
+    .remove(new Uint8Array([2].concat(new Array(31).fill(0))));
   // This mirrors the result in the C++ MuHash3072 unit test
   const observed = hash.digest().toReversed();
   // This matches with a rust implementation
@@ -91,7 +97,36 @@ Deno.test("interoperability muhash", () => {
   assertEquals(observed, expected);
 });
 
-Deno.test("basic chacha20", () => {
+Deno.test("immutable muhash", () => {
+  const left = MuHash.default().insert(utf8ToBytes("hello"));
+
+  const right = MuHash.default().insert(
+    utf8ToBytes("world"),
+    utf8ToBytes("lucas"),
+  );
+
+  assert(
+    left.union(right).equals(
+      MuHash.default().insert(
+        utf8ToBytes("hello"),
+        utf8ToBytes("world"),
+        utf8ToBytes("lucas"),
+      ),
+    ),
+  );
+
+  assert(
+    !left.equals(
+      MuHash.default().insert(
+        utf8ToBytes("hello"),
+        utf8ToBytes("world"),
+        utf8ToBytes("lucas"),
+      ),
+    ),
+  );
+});
+
+Deno.test("check chacha20", () => {
   const BYTE_SIZE = 3072 / 8;
   const NONCE = new Uint8Array(12);
   const DATA = new Uint8Array(BYTE_SIZE);

@@ -64,13 +64,7 @@ function modInv(a: bigint, n: bigint): bigint {
 }
 
 export class MuHash implements HomomorphicHasher {
-  numerator = 1n;
-  denominator = 1n;
-
-  constructor(numerator: bigint = 1n, denominator: bigint = 1n) {
-    this.numerator = numerator;
-    this.denominator = denominator;
-  }
+  constructor(public numerator: bigint = 1n, public denominator: bigint = 1n) {}
 
   static default() {
     return new MuHash();
@@ -87,19 +81,21 @@ export class MuHash implements HomomorphicHasher {
   }
 
   insert(...items: Input[]) {
+    const out = this.clone();
     for (const item of items) {
       const element = bytesToNum3072(sha256(item));
-      this.numerator = (this.numerator * element) % PRIME;
+      out.numerator = (out.numerator * element) % PRIME;
     }
-    return this;
+    return out;
   }
 
   remove(...items: Input[]) {
+    const out = this.clone();
     for (const item of items) {
       const element = bytesToNum3072(sha256(item));
-      this.denominator = (this.denominator * element) % PRIME;
+      out.denominator = (out.denominator * element) % PRIME;
     }
-    return this;
+    return out;
   }
 
   digest() {
@@ -108,22 +104,28 @@ export class MuHash implements HomomorphicHasher {
     return sha256(bytes);
   }
 
-  normalize() {
-    this.numerator = (this.numerator * modInv(this.denominator, PRIME)) % PRIME;
-    this.denominator = 1n;
-    return this;
+  normalized() {
+    const numerator = (this.numerator * modInv(this.denominator, PRIME)) %
+      PRIME;
+    return new MuHash(numerator);
   }
 
   union(other: MuHash) {
-    this.numerator = (this.numerator * other.numerator) % PRIME;
-    this.denominator = (this.denominator * other.denominator) % PRIME;
-    return this;
+    const out = this.clone();
+    out.numerator = (this.numerator * other.numerator) % PRIME;
+    out.denominator = (this.denominator * other.denominator) % PRIME;
+    return out;
   }
 
   difference(other: MuHash) {
-    this.numerator = (this.numerator * modInv(other.denominator, PRIME)) %
+    const out = this.clone();
+    out.numerator = (this.numerator * modInv(other.denominator, PRIME)) %
       PRIME;
-    this.denominator = (this.denominator * other.numerator) % PRIME;
-    return this;
+    out.denominator = (this.denominator * other.numerator) % PRIME;
+    return out;
+  }
+
+  clone() {
+    return new MuHash(this.numerator, this.denominator) as this;
   }
 }
