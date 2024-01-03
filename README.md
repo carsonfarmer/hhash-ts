@@ -1,7 +1,7 @@
 # Homomorphic Hashing
 
 [![Test](https://github.com/carsonfarmer/hhash-ts/actions/workflows/test.yml/badge.svg)](https://github.com/carsonfarmer/hhash-ts/actions)
-[![Docs](https://github.com/carsonfarmer/hhash-ts/actions/workflows/docs.yml/badge.svg)](https://github.com/carsonfarmer/hhash-ts/actions)
+[![Docs](https://github.com/carsonfarmer/hhash-ts/actions/workflows/docs.yml/badge.svg)](https://carsonfarmer.github.io/hhash-ts/)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![standard-readme compliant](https://img.shields.io/badge/standard--readme-ok-green.svg)](https://github.com/RichardLitt/standard-readme)
 
@@ -75,6 +75,8 @@ deno lint
 ```bash
 deno doc mod.ts
 ```
+
+Auto-deployed to https://carsonfarmer.github.io/hhash-ts/
 
 # Contributing
 
