@@ -8,7 +8,7 @@ import { RistrettoPoint } from "npm:@noble/curves/ed25519";
 import { type HomomorphicHasher, type Input } from "./interface.ts";
 
 // Needed due to how the RistrettoPoint type is exported
-export type RistrettoPoint = InstanceType<typeof RistrettoPoint>;
+type RistrettoPoint = InstanceType<typeof RistrettoPoint>;
 
 export class RistrettoMultisetHash implements HomomorphicHasher {
   constructor(public accumulator: RistrettoPoint = RistrettoPoint.ZERO) {}
