@@ -1,8 +1,18 @@
-import { type Input } from "npm:@noble/hashes/utils";
+// Copyright (c) 2023, Carson Farmer
+// Copyright (c) 2023, RunTime Machines AG
+// SPDX-License-Identifier: Apache-2.0
+
 import { shake128 } from "npm:@noble/hashes/sha3";
+import { type HomomorphicHasher, type Input } from "./interface.ts";
+
+// These constants amount to a 16 byte hash, which is ~2kbs.
+// Anything bigger is too large and anything smaller isn't secure enough
+const SUM_SIZE = 1024; // Uint16 size
+const HASH_SIZE = SUM_SIZE * 2; // Uint8 size
+const DEFAULT_HASH: HashFunction = shake128;
 
 // From npm:@noble/curves
-export function equalBytes(b1: Uint8Array, b2: Uint8Array) {
+function equalBytes(b1: Uint8Array, b2: Uint8Array) {
   // We don't care about timing attacks here
   if (b1.length !== b2.length) {
     return false;
@@ -13,18 +23,9 @@ export function equalBytes(b1: Uint8Array, b2: Uint8Array) {
   return true;
 }
 
-export type HashFunction = (
-  msg: Input,
-  opts?: { dkLen: number } | undefined,
-) => Uint8Array;
+export type HashFunction = (msg: Input, opts?: { dkLen: number }) => Uint8Array;
 
-// These consts amount to a 16 byte hash, which is ~2kbs.
-// Anything bigger is too large and anything smaller isn't secure enough
-export const SUM_SIZE = 1024; // Uint16 size
-const HASH_SIZE = 2048; // Uint8 size
-const DEFAULT_HASH: HashFunction = shake128;
-
-export class LtHash16 {
+export class LtHash16 implements HomomorphicHasher {
   hash: HashFunction;
   accumulator: Uint16Array = new Uint16Array(SUM_SIZE);
 

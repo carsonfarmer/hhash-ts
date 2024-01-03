@@ -3,7 +3,7 @@ import {
   assert,
   assertEquals,
 } from "https://deno.land/std@0.91.0/testing/asserts.ts";
-import { LtHash16, SUM_SIZE } from "./lthash.ts";
+import { LtHash16 } from "./lthash.ts";
 
 Deno.test("basic lthash", () => {
   const hash = LtHash16.default();
@@ -18,7 +18,7 @@ Deno.test("basic lthash", () => {
 
   assert(hash.equals(hashBis));
   assertEquals(hash.digest(), hashBis.digest());
-  assertEquals(hash.digest().byteLength, SUM_SIZE * 2);
+  assertEquals(hash.digest().byteLength, 1024 * 2);
 });
 
 Deno.test("union lthash", () => {

@@ -3,7 +3,7 @@ import {
   assert,
   assertEquals,
 } from "https://deno.land/std@0.91.0/testing/asserts.ts";
-import { RistrettoMultisetHash } from "./main.ts";
+import { RistrettoMultisetHash } from "./ecmh.ts";
 
 Deno.test("basic ristretto", () => {
   const hash = RistrettoMultisetHash.default();
